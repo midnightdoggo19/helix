@@ -3,7 +3,7 @@
 #  Build:  docker build -t helix-dev -f docker/Dockerfile .
 #  Run:    docker run --rm -it -v $(pwd):/helix helix-dev
 # ─────────────────────────────────────────────────────────────────────
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CROSS_PREFIX=/opt/cross
