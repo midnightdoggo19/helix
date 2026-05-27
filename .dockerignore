@@ -1,0 +1,10 @@
+build/
+.git/
+.github/
+*.iso
+*.bin
+*.log
+*.ppm
+.vscode/
+.idea/
+.DS_Store

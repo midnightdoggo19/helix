@@ -1,0 +1,32 @@
+%% HelixOS — physical memory map at runtime
+
+flowchart TB
+    subgraph A ["Low memory (< 1 MiB) — reserved"]
+        IVT["0x00000000<br/>IVT / BIOS data"]
+        VGA["0x000A0000<br/>VGA framebuffer (0xB8000)"]
+        ROM["0x000C0000<br/>BIOS / option ROMs"]
+    end
+
+    subgraph B ["Kernel region (1 MiB+)"]
+        IMG["0x00100000<br/>kernel image<br/>.multiboot / .text / .rodata / .data / .bss"]
+        BMP["kernel_end<br/>PMM bitmap (4 KiB)"]
+        PT["early page tables"]
+    end
+
+    subgraph C ["Identity-mapped (kernel reachable, ≤ 8 MiB)"]
+        ID["everything above mapped VA = PA<br/>under 4 KiB paging"]
+    end
+
+    subgraph D ["Heap-managed (mapped on demand)"]
+        HEAP["0x00C00000<br/>kernel heap (1 MiB)"]
+        STACKS["task stacks (8 KiB each)<br/>vfs nodes, etc."]
+    end
+
+    subgraph E ["Unmapped — touching here = page fault"]
+        FREE["12 MiB ... 128 MiB<br/>free physical, no virtual mapping"]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E

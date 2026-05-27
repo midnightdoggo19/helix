@@ -1,0 +1,40 @@
+# Build output
+build/
+*.o
+*.elf
+*.bin
+*.iso
+
+# Cross-toolchain (typically lives outside the repo, but if someone puts it here)
+toolchain/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Local test artifacts
+*.log
+core
+core.*
+serial.log
+*.ppm
+
+# Coverage / profiling
+*.gcda
+*.gcno
+*.gcov
+
+# Test outputs
+tests/results/
+
+# Local override config
+.env
+.env.local
+
+# clang
+.clangd/
+compile_commands.json

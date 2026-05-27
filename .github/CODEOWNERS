@@ -1,0 +1,22 @@
+# HelixOS CODEOWNERS
+#
+# Default owners (review required on every PR)
+* @prakhardewangan2005-hash
+
+# Subsystem owners (additional reviewers for specific paths)
+/src/arch/i386/      @prakhardewangan2005-hash
+/src/memory/         @prakhardewangan2005-hash
+/src/process/        @prakhardewangan2005-hash
+/src/syscalls/       @prakhardewangan2005-hash
+/src/drivers/        @prakhardewangan2005-hash
+/src/fs/             @prakhardewangan2005-hash
+/src/shell/          @prakhardewangan2005-hash
+
+/docs/               @prakhardewangan2005-hash
+/docs/design/adr/    @prakhardewangan2005-hash
+
+# CI / build infrastructure
+/.github/            @prakhardewangan2005-hash
+/Makefile            @prakhardewangan2005-hash
+/docker/             @prakhardewangan2005-hash
+/scripts/            @prakhardewangan2005-hash

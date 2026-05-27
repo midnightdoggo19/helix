@@ -1,0 +1,21 @@
+# Default to LF line endings; never CRLF
+* text=auto eol=lf
+
+# Source code
+*.c     text diff=c
+*.h     text diff=c
+*.asm   text
+*.S     text
+*.s     text
+*.ld    text
+*.md    text diff=markdown
+*.mmd   text
+*.sh    text eol=lf
+Makefile text
+
+# Binary
+*.png   binary
+*.iso   binary
+*.bin   binary
+*.elf   binary
+*.tar.gz binary

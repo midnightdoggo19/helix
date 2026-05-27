@@ -1,0 +1,58 @@
+%% HelixOS — full subsystem layering
+%% Renders natively on GitHub Markdown.
+
+flowchart TB
+    subgraph UM["User-ish (kernel thread today, ring 3 in v0.2)"]
+        SHELL["Shell process<br/>14 built-in commands"]
+    end
+
+    subgraph SC["INT 0x80 — system call gate"]
+        DISP["syscall dispatcher<br/>9 calls"]
+    end
+
+    subgraph KM["Kernel mode (Ring 0)"]
+        direction TB
+        subgraph CORE["Core"]
+            TASK["task / PCB"]
+            SCHED["Round-Robin scheduler"]
+            SYNC["mutex / semaphore / spinlock"]
+        end
+        subgraph MM["Memory"]
+            PMM["PMM (bitmap)"]
+            VMM["VMM + paging<br/>4 KiB pages, identity 8 MiB"]
+            HEAP["kernel heap<br/>kmalloc / kfree"]
+        end
+        subgraph FS["Filesystem"]
+            VFS["VFS layer"]
+            RAMFS["RAMFS at /"]
+        end
+        subgraph DRV["Drivers"]
+            VGA["VGA 80×25"]
+            SERIAL["Serial COM1"]
+            PIT["PIT @ 100 Hz"]
+            KBD["PS/2 keyboard"]
+        end
+        subgraph HAL["HAL (arch/i386)"]
+            GDT["GDT (5 entries)"]
+            IDT["IDT + ISR/IRQ stubs"]
+            PIC["8259 PIC<br/>(remapped to 0x20)"]
+        end
+    end
+
+    subgraph BOOT["Boot"]
+        GRUB["GRUB (Multiboot1)"]
+        ENTRY["boot.asm"]
+    end
+
+    HW["x86 / QEMU"]
+
+    SHELL --> DISP
+    DISP --> CORE
+    CORE --> MM
+    CORE --> FS
+    FS --> DRV
+    DRV --> HAL
+    HAL --> HW
+    BOOT --> HAL
+    GRUB --> ENTRY
+    ENTRY --> CORE

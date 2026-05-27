@@ -1,0 +1,44 @@
+%% HelixOS — boot sequence from power-on to shell
+
+sequenceDiagram
+    autonumber
+    participant BIOS as BIOS / firmware
+    participant GRUB as GRUB
+    participant ASM  as boot.asm
+    participant KM   as kmain.c
+    participant HAL  as arch/i386
+    participant MEM  as memory
+    participant DRV  as drivers
+    participant PRC  as process
+    participant SYS  as syscall
+    participant FS   as ramfs
+    participant SH   as shell
+
+    BIOS->>GRUB: load boot record from ISO
+    GRUB->>ASM:  multiboot jump to _start<br/>EAX=magic, EBX=info ptr
+    ASM->>ASM:   install 16 KiB stack
+    ASM->>KM:    call kmain(eax, ebx)
+
+    KM->>DRV:    serial_init()
+    KM->>DRV:    vga_init()
+    KM->>HAL:    gdt_init()
+    KM->>HAL:    idt_init()
+    KM->>HAL:    isr_install() (vectors 0-31)
+    KM->>HAL:    irq_install() (vectors 32-47)
+    KM->>HAL:    pic_init() (remap)
+    KM->>MEM:    pmm_init()
+    KM->>MEM:    paging_init() -> CR0.PG=1
+    KM->>MEM:    vmm_init()
+    KM->>MEM:    heap_init() (1 MiB @ 0xC00000)
+    KM->>HAL:    STI (preemption possible)
+    KM->>DRV:    pit_init() (100 Hz)
+    KM->>DRV:    kbd_init()
+    KM->>PRC:    task_init() (install init pid 0)
+    KM->>SYS:    syscall_init() (INT 0x80)
+    KM->>FS:     ramfs_init()
+    KM->>PRC:    task_create("shell", shell_main)
+    KM-->>KM:    idle: for(;;) hlt
+
+    PRC->>SH:    PIT IRQ -> scheduler picks shell
+    SH->>SH:     read /etc/motd via syscall
+    SH-->>SH:    helix:/$ _

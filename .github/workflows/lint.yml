@@ -1,0 +1,58 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format-check:
+    name: clang-format check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Run clang-format --dry-run
+        run: |
+          find src include -name '*.c' -o -name '*.h' | \
+            xargs clang-format --dry-run --Werror
+
+  cppcheck:
+    name: cppcheck static analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=warning,style,performance,portability \
+                   --inline-suppr \
+                   --suppress=missingIncludeSystem \
+                   --error-exitcode=1 \
+                   -Iinclude -Isrc src
+
+  shellcheck:
+    name: shellcheck on scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Lint scripts
+        run: |
+          find scripts -name '*.sh' -print0 | xargs -0 shellcheck

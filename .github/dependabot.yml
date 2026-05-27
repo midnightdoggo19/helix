@@ -1,0 +1,30 @@
+# Dependabot configuration.
+#
+# HelixOS has no language-level dependencies (we build our own libc),
+# but we DO depend on:
+#  - GitHub Actions (workflow `uses:` references)
+#  - The Docker base image (ubuntu:24.04)
+#
+# Dependabot keeps both up to date.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore"

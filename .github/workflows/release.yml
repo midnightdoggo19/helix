@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cross compiler
+        id: cache-cross
+        uses: actions/cache@v4
+        with:
+          path: ~/opt/cross
+          key: cross-i686-elf-binutils-2.42-gcc-13.2.0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential nasm \
+            qemu-system-x86 \
+            grub-pc-bin grub-common xorriso mtools \
+            gcc-multilib make wget \
+            bison flex libgmp-dev libmpc-dev libmpfr-dev texinfo
+
+      - name: Build cross compiler (if cache miss)
+        if: steps.cache-cross.outputs.cache-hit != 'true'
+        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+
+      - name: Set PATH
+        run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
+
+      - name: Build kernel + ISO
+        run: |
+          make
+          make iso
+
+      - name: Package source tarball
+        run: |
+          git archive --format=tar.gz \
+            --prefix=helix-os-${GITHUB_REF_NAME#v}/ \
+            -o helix-os-${GITHUB_REF_NAME#v}.tar.gz \
+            HEAD
+
+      - name: Generate checksums
+        run: |
+          cd build && sha256sum helix.bin helix.iso > SHA256SUMS
+          cd .. && sha256sum helix-os-*.tar.gz >> build/SHA256SUMS
+
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          ver="${GITHUB_REF_NAME#v}"
+          awk "/^## \\[${ver}\\]/{flag=1;next}/^## \\[/{flag=0}flag" CHANGELOG.md > release-notes.md
+          cat release-notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: HelixOS ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            build/helix.bin
+            build/helix.iso
+            build/SHA256SUMS
+            helix-os-*.tar.gz
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

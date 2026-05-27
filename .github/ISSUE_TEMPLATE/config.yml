@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/prakhardewangan2005-hash/helix-os/security/advisories/new
+    about: Don't open public issues for security problems — use private disclosure. See SECURITY.md.
+  - name: Question or discussion
+    url: https://github.com/prakhardewangan2005-hash/helix-os/discussions
+    about: For open-ended questions about HelixOS, design discussions, or "how does X work?"

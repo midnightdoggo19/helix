@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build kernel (i686-elf)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cross compiler
+        id: cache-cross
+        uses: actions/cache@v4
+        with:
+          path: ~/opt/cross
+          key: cross-i686-elf-binutils-2.42-gcc-13.2.0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential nasm \
+            qemu-system-x86 \
+            grub-pc-bin grub-common xorriso mtools \
+            gcc-multilib make wget \
+            bison flex libgmp-dev libmpc-dev libmpfr-dev texinfo
+
+      - name: Build cross compiler (if cache miss)
+        if: steps.cache-cross.outputs.cache-hit != 'true'
+        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+
+      - name: Set PATH
+        run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
+
+      - name: Verify toolchain
+        run: |
+          which i686-elf-gcc
+          i686-elf-gcc --version
+          nasm --version
+
+      - name: Build kernel
+        run: make
+
+      - name: Build ISO
+        run: make iso
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: helix-binaries
+          path: |
+            build/helix.bin
+            build/helix.iso
+          retention-days: 14
+
+  smoke-test:
+    name: Boot smoke test (QEMU)
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86
+
+      - name: Download ISO
+        uses: actions/download-artifact@v4
+        with:
+          name: helix-binaries
+          path: build/
+
+      - name: Boot HelixOS and check for shell prompt
+        run: |
+          timeout 10 qemu-system-i386 \
+            -cdrom build/helix.iso -m 128M -display none \
+            -serial file:/tmp/serial.log -no-reboot &
+          QPID=$!
+          sleep 5
+          kill $QPID 2>/dev/null || true
+          wait || true
+          echo "--- Serial log ---"
+          cat /tmp/serial.log
+          grep -q '\[ READY \] HelixOS' /tmp/serial.log
+          grep -q 'helix:/\$' /tmp/serial.log
+          echo "✓ Boot smoke test passed"

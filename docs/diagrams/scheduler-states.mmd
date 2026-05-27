@@ -1,0 +1,26 @@
+%% HelixOS — task state machine
+
+stateDiagram-v2
+    [*] --> NEW: task_create
+    NEW --> READY: inserted into run queue
+    READY --> RUNNING: pick_next selects
+    RUNNING --> READY: scheduler_tick preempts
+    RUNNING --> SLEEPING: task_sleep_ms(N)
+    SLEEPING --> READY: task_wake_due(now ≥ wake_tick)
+    RUNNING --> ZOMBIE: task_exit()
+    ZOMBIE --> [*]: (not reaped in v0.1)
+
+    note right of READY
+        On the run queue.
+        scheduler picks the next READY task in RR order.
+    end note
+
+    note right of SLEEPING
+        Not eligible until wake_tick.
+        Wake signal: PIT tick reaching deadline.
+    end note
+
+    note right of ZOMBIE
+        Exited but PCB lives on.
+        v0.2 will add waitpid/reaper.
+    end note

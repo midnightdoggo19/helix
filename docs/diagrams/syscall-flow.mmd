@@ -1,0 +1,22 @@
+%% HelixOS — syscall flow (INT 0x80)
+
+sequenceDiagram
+    participant App as Caller<br/>(shell or future user prog)
+    participant Stub as syscall_dispatch.asm
+    participant Disp as syscall_dispatch (C)
+    participant Sub as sys_write / sys_read / ...
+    participant Drv as relevant driver
+
+    App->>App: load eax=N, ebx,ecx,...=args
+    App->>Stub: INT 0x80
+    Stub->>Stub: cli, push 0, push 0x80<br/>pusha, save ds<br/>load kernel ds
+    Stub->>Disp: call syscall_dispatch(esp)
+    Disp->>Disp: bounds-check eax<br/>look up table[eax]
+    Disp->>Sub: invoke sys_*(regs)
+    Sub->>Drv: kputc / inb / paging_translate / etc.
+    Drv-->>Sub: result
+    Sub-->>Disp: int32_t rv
+    Disp->>Disp: regs->eax = rv
+    Disp-->>Stub: return
+    Stub->>Stub: restore ds, popa<br/>add esp, 8 (drop int_no/err)<br/>sti, iret
+    Stub-->>App: rv lives in eax

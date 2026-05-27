@@ -1,0 +1,44 @@
+HelixOS
+Copyright (c) 2026 HelixOS Authors
+
+This project is licensed under the MIT License. See LICENSE for the
+full text.
+
+──────────────────────────────────────────────────────────────────────
+  Third-party material
+──────────────────────────────────────────────────────────────────────
+
+HelixOS does not vendor any third-party source code. Every line in
+src/ and include/ was written for this project.
+
+Build-time tools used (none redistributed):
+
+  * GNU Binutils       — GPL v3+
+  * GNU GCC            — GPL v3 with libgcc runtime exception
+  * NASM               — 2-clause BSD
+  * GNU GRUB           — GPL v3+
+  * QEMU               — GPL v2+
+
+These are obtained from your system package manager or built from
+official source by scripts/build-toolchain.sh; they are not bundled
+into the HelixOS binary or distributed with it.
+
+──────────────────────────────────────────────────────────────────────
+  Architectural patterns
+──────────────────────────────────────────────────────────────────────
+
+The boot path, IDT setup pattern, and PIC remap sequence are common
+knowledge in x86 kernel development. The OSDev wiki (wiki.osdev.org)
+and James Molloy's "Roll your own toy UNIX-clone OS" tutorial were
+consulted for invariants and ordering; no code was copied. See
+AUTHORS.md for full acknowledgements.
+
+──────────────────────────────────────────────────────────────────────
+  Trademarks
+──────────────────────────────────────────────────────────────────────
+
+Linux is a registered trademark of Linus Torvalds.
+UNIX is a registered trademark of The Open Group.
+x86, i386, i686 are trademarks of Intel Corporation.
+All other trademarks are the property of their respective owners.
+HelixOS is not affiliated with any of the above.

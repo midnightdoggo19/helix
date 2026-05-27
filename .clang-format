@@ -1,0 +1,48 @@
+---
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++03   # closest to C; clang-format doesn't have a pure-C value
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+# Braces
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+
+# Pointer alignment
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+# Includes
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# Alignment
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignAfterOpenBracket: Align
+AlignTrailingComments: true
+
+# Spacing
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Functions / parameters
+BinPackArguments: true
+BinPackParameters: true
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# Other
+ReflowComments: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
