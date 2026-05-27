@@ -33,7 +33,7 @@ jobs:
 
       - name: Build cross compiler (if cache miss)
         if: steps.cache-cross.outputs.cache-hit != 'true'
-        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+        run: bash ./scripts/build-toolchain.sh "$HOME/opt/cross"
 
       - name: Set PATH
         run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
@@ -60,6 +60,11 @@ jobs:
         run: |
           ver="${GITHUB_REF_NAME#v}"
           awk "/^## \\[${ver}\\]/{flag=1;next}/^## \\[/{flag=0}flag" CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release ${GITHUB_REF_NAME}" > release-notes.md
+            echo "" >> release-notes.md
+            echo "See CHANGELOG.md for details." >> release-notes.md
+          fi
           cat release-notes.md
 
       - name: Create GitHub release

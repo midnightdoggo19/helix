@@ -32,7 +32,7 @@ jobs:
 
       - name: Build cross compiler (if cache miss)
         if: steps.cache-cross.outputs.cache-hit != 'true'
-        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+        run: bash ./scripts/build-toolchain.sh "$HOME/opt/cross"
 
       - name: Set PATH
         run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
@@ -82,7 +82,7 @@ jobs:
             -cdrom build/helix.iso -m 128M -display none \
             -serial file:/tmp/serial.log -no-reboot &
           QPID=$!
-          sleep 5
+          sleep 6
           kill $QPID 2>/dev/null || true
           wait || true
           echo "--- Serial log ---"
