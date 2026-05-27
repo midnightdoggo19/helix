@@ -71,7 +71,7 @@ jobs:
           sudo apt-get install -y qemu-system-x86
 
       - name: Download ISO
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: helix-binaries
           path: build/
