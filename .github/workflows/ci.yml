@@ -15,7 +15,7 @@ jobs:
 
       - name: Cache cross compiler
         id: cache-cross
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/opt/cross
           key: cross-i686-elf-binutils-2.42-gcc-13.2.0
