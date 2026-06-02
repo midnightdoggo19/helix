@@ -11,7 +11,7 @@ jobs:
     name: Build kernel (i686-elf)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cross compiler
         id: cache-cross
@@ -63,7 +63,7 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install QEMU
         run: |
