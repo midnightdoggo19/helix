@@ -12,11 +12,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cross compiler
         id: cache-cross
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/opt/cross
           key: cross-i686-elf-binutils-2.42-gcc-13.2.0
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build cross compiler (if cache miss)
         if: steps.cache-cross.outputs.cache-hit != 'true'
-        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+        run: bash ./scripts/build-toolchain.sh "$HOME/opt/cross"
 
       - name: Set PATH
         run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
@@ -60,10 +60,15 @@ jobs:
         run: |
           ver="${GITHUB_REF_NAME#v}"
           awk "/^## \\[${ver}\\]/{flag=1;next}/^## \\[/{flag=0}flag" CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release ${GITHUB_REF_NAME}" > release-notes.md
+            echo "" >> release-notes.md
+            echo "See CHANGELOG.md for details." >> release-notes.md
+          fi
           cat release-notes.md
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: HelixOS ${{ github.ref_name }}
           body_path: release-notes.md

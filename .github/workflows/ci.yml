@@ -11,11 +11,11 @@ jobs:
     name: Build kernel (i686-elf)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cross compiler
         id: cache-cross
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/opt/cross
           key: cross-i686-elf-binutils-2.42-gcc-13.2.0
@@ -32,7 +32,7 @@ jobs:
 
       - name: Build cross compiler (if cache miss)
         if: steps.cache-cross.outputs.cache-hit != 'true'
-        run: ./scripts/build-toolchain.sh "$HOME/opt/cross"
+        run: bash ./scripts/build-toolchain.sh "$HOME/opt/cross"
 
       - name: Set PATH
         run: echo "$HOME/opt/cross/bin" >> $GITHUB_PATH
@@ -50,7 +50,7 @@ jobs:
         run: make iso
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: helix-binaries
           path: |
@@ -63,7 +63,7 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install QEMU
         run: |
@@ -82,7 +82,7 @@ jobs:
             -cdrom build/helix.iso -m 128M -display none \
             -serial file:/tmp/serial.log -no-reboot &
           QPID=$!
-          sleep 5
+          sleep 6
           kill $QPID 2>/dev/null || true
           wait || true
           echo "--- Serial log ---"
